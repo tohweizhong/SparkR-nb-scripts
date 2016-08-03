@@ -1,8 +1,11 @@
+# set system environments
+# 
+
 Sys.setenv(SPARK_HOME = "C:/stack/spark-1.6.2-bin-hadoop2.6") # <--- change this to connect to server
 .libPaths(c(file.path(Sys.getenv("SPARK_HOME", "R", "lib")), .libPaths()))
 
-if (!require('devtools')) install.packages('devtools')
-devtools::install_github('apache/spark@v1.6.2', subdir='R/pkg')
+#if (!require('devtools')) install.packages('devtools')
+#devtools::install_github('apache/spark@v1.6.2', subdir='R/pkg')
 
 library(SparkR)
 
