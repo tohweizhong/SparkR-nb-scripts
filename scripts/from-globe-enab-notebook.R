@@ -1,5 +1,4 @@
 # set system environments
-# 
 
 Sys.setenv(SPARK_HOME = "C:/stack/spark-1.6.2-bin-hadoop2.6") # <--- change this to connect to server
 .libPaths(c(file.path(Sys.getenv("SPARK_HOME", "R", "lib")), .libPaths()))
@@ -59,3 +58,38 @@ linesWithSpark <- SparkR:::filterRDD(textFile, function(line){ grepl("Spark", li
 count(SparkR:::filterRDD(textFile, function(line){ grepl("Spark", line)})) # How many lines contain "Spark"?
 
 #SparkR:::reduce( lapply( textFile, function(line) { length(strsplit(unlist(line), " ")[[1]])}), function(a, b) { if (a > b) { a } else { b }})
+
+max <- function(a, b) {if (a > b) { a } else { b }}
+reduce(map(textFile, function(line) { length(strsplit(unlist(line), " ")[[1]])}), max)
+
+words <- flatMap(textFile,
+                 function(line) {
+                   strsplit(line, " ")[[1]]
+                 })
+
+wordCount <- lapply(words, function(word){ list(word, 1L) })
+counts <- reduceByKey(wordCount, "+", 2L)
+
+output <- collect(counts)
+
+for (wordcount in output) {
+  cat(wordcount[[1]], ": ", wordcount[[2]], "\n")
+}
+
+cache(linesWithSpark)
+system.time(count(linesWithSpark))
+
+system.time(count(linesWithSpark))
+
+# library(SparkR)
+# 
+# sc <- sparkR.init(master="local")
+# 
+# logFile <- "/home/cloudera/SparkR-pkg/README.md"
+# 
+# logData <- cache(textFile(sc, logFile))
+# 
+# numAs <- count(filterRDD(logData, function(s) { grepl("a", s) }))
+# numBs <- count(filterRDD(logData, function(s) { grepl("b", s) }))
+# 
+# paste("Lines with a: ", numAs, ", Lines with b: ", numBs, sep="")
