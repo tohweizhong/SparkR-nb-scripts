@@ -1,2 +1,2 @@
-# SparkR-nb-scripts
+# nb-scripts-SparkR
 SparkR notebooks and scripts
